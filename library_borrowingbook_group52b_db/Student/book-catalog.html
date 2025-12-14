@@ -1,0 +1,1420 @@
+ <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Book Catalog</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+      <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#31694E",
+              "background-light": "#f8fafc",
+              "background-dark": "#1e293b",
+            },
+            fontFamily: {
+              display: ["Poppins", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+            },
+          },
+        },
+      };
+    </script>
+    <script>
+      // Auto highlight active sidebar link
+      (function () {
+        var links = document.querySelectorAll('aside nav a');
+        var current = location.pathname.split('/').pop();
+        if (!current) current = 'book-catalog.html';
+        links.forEach(function (a) {
+          var href = a.getAttribute('href');
+          if (!href) return;
+          var name = href.split('/').pop();
+          if (!name) return;
+          if (name === current) {
+            a.classList.add('bg-primary', 'text-white');
+            a.setAttribute('aria-current', 'page');
+          } else {
+            a.classList.remove('bg-primary', 'text-white');
+            a.removeAttribute('aria-current');
+          }
+        });
+      })();
+    </script>
+    <script>
+      // Sidebar toggle for small screens (show/hide with backdrop)
+      (function () {
+        var btn = document.getElementById('menu-btn');
+        var closeBtn = document.getElementById('menu-close');
+        var sidebar = document.querySelector('aside');
+        var backdrop = document.getElementById('backdrop');
+
+        function showSidebar() {
+          sidebar.classList.remove('-translate-x-full');
+          sidebar.classList.add('translate-x-0');
+          backdrop.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+          if (btn) btn.setAttribute('aria-expanded', 'true');
+        }
+
+        function hideSidebar() {
+          sidebar.classList.add('-translate-x-full');
+          sidebar.classList.remove('translate-x-0');
+          backdrop.classList.add('hidden');
+          document.body.style.overflow = '';
+          if (btn) btn.setAttribute('aria-expanded', 'false');
+        }
+
+        document.addEventListener('keydown', function (ev) {
+          if (ev.key === 'Escape' && window.innerWidth < 768) hideSidebar();
+        });
+
+        if (btn && sidebar && backdrop) btn.addEventListener('click', showSidebar);
+        if (closeBtn && sidebar && backdrop) closeBtn.addEventListener('click', hideSidebar);
+        if (backdrop) backdrop.addEventListener('click', hideSidebar);
+      })();
+    </script>
+  </head>
+  <body
+    class="font-display bg-background-light dark:bg-background-dark text-slate-700 dark:text-slate-300"
+  >
+    <div class="flex h-screen">
+      <div id="backdrop" class="fixed inset-0 bg-black/40 z-40 hidden md:hidden"></div>
+      <aside id="sidebar"
+        class="fixed inset-y-0 left-0 z-50 w-64 transform -translate-x-full md:translate-x-0 md:static md:flex bg-slate-50 dark:bg-slate-800 flex flex-col border-r border-slate-200 dark:border-slate-700 transition-transform duration-200"
+      >
+        <div
+          class="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-700"
+        >
+          <span class="material-icons text-primary mr-2">school</span>
+          <span class="font-bold text-lg text-slate-800 dark:text-slate-100"
+            >Library System</span
+          >
+          <button id="menu-close" class="md:hidden p-2 text-slate-500 dark:text-slate-300 hover:text-slate-700 dark:hover:text-slate-200 ml-auto">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+          <a
+            class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md"
+            href="student-dashboard.html"
+          >
+            <span class="material-icons mr-3">dashboard</span>
+            Dashboard
+          </a>
+          <a
+            class="flex items-center px-4 py-2 text-sm font-medium bg-primary text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md"
+            href="book-catalog.html"
+          >
+            <span class="material-icons mr-3">menu_book</span>
+            Book Catalog
+          </a>
+          <a
+            class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md"
+            href="cart.html"
+          >
+            <span class="material-icons mr-3">shopping_cart</span>
+            My Borrowing
+          </a>
+          
+          <a
+            class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md"
+            href="borrowing.html"
+          >
+            <span class="material-icons mr-3">history</span>
+            My Borrowing History
+          </a>
+          
+        </nav>
+      </aside>
+      <div class="flex-1 flex flex-col">
+        <header class="h-16 flex items-center justify-between px-8 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+          <div class="flex items-center md:hidden mr-4">
+            <button id="menu-btn" aria-expanded="false" class="p-2 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100" aria-label="Open sidebar">
+              <span class="material-icons">menu</span>
+            </button>
+          </div>
+          <h1 class="text-xl font-semibold text-slate-800 dark:text-slate-100">Student Dashboard</h1>
+          <div class="flex items-center gap-4">
+            <div class="text-right">
+              <p class="font-medium text-sm text-slate-800 dark:text-slate-100">Anonymous101</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">anonymous@gmail.com</p>
+            </div>
+            <button onclick="window.location.href='../login/login.html'" class="ml-4 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"><span class="material-icons">logout</span></button>
+          </div>
+        </header>
+        <main class="flex-1 p-8 overflow-y-auto">
+          <div class="mb-8">
+            <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-100">
+              Book Catalog
+            </h2>
+            <p class="text-slate-500 dark:text-slate-400">
+              Search and browse available books in our library.
+            </p>
+          </div>
+          <div class="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mb-8">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="material-icons text-primary">search</span>
+              <h4 class="text-lg font-semibold text-slate-800 dark:text-white">
+                Search &amp; Discover
+              </h4>
+            </div>
+            <p class="text-slate-500 dark:text-slate-400 mb-6">
+              Find exactly what you're looking for with our advanced search tools.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <input
+                id="search-input"
+                class="col-span-1 md:col-span-1 bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg focus:ring-primary focus:border-primary"
+                placeholder="Search by title, author, ISBN, Book ID..."
+                type="text"
+              />
+              <select
+                id="category-select"
+                class="col-span-1 md:col-span-1 bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg focus:ring-primary focus:border-primary"
+              >
+                <option>All Categories</option>
+                <option>Computer Science</option>
+                <option>Programming</option>
+                <option>Mathematics</option>
+                <option>Physics</option>
+                <option>History</option>
+              </select>
+              <select
+                id="status-select"
+                class="col-span-1 md:col-span-1 bg-slate-50 dark:bg-slate-800 border-slate-300 dark:border-slate-700 rounded-lg focus:ring-primary focus:border-primary"
+              >
+                <option>All Status</option>
+                <option>Available</option>
+                <option>Borrowed</option>
+              </select>
+            </div>
+            <br>
+            <div class="flex justify-between items-center mb-6">
+              <div>
+                <br>
+                <h4 class="font-bold text-lg">8 Books Found</h4>
+                <p
+                  class="text-sm text-text-light-secondary dark:text-dark-secondary"
+                >
+                  Total collection: 8 books
+                </p>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="text-green-600 font-semibold">Available: 5</span>
+                <button
+                  class="flex items-center gap-2 px-4 py-2 rounded-md border border-border-light dark:border-border-dark text-sm bg-surface-light dark:bg-surface-dark hover:bg-slate-100 dark:hover:bg-slate-700"
+                >
+                  <span class="material-icons-outlined text-base"
+                    >shopping_cart</span
+                  >
+                  0 in cart
+                </button>
+              </div>
+            </div>
+            <div
+              class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6"
+            >
+              <div
+                class="cursor-pointer group bg-surface-light dark:bg-surface-dark rounded-lg overflow-hidden border border-border-light dark:border-border-dark transition-all duration-300"
+                onclick="openModal()"
+                data-category="Programming"
+                data-status="Available"
+              >
+                <div class="relative">
+                  <img
+                    alt="An open book showing pages of text."
+                    class="w-full h-40 object-cover"
+                    src="../picture image/Clean Code_ A Handbook of Agile Software Craftsmanship.jpg"
+                  />
+                  <div class="absolute top-2 right-2 flex items-center gap-1.5">
+                    <span
+                      class="text-xs font-semibold text-slate-700 bg-slate-200/80 backdrop-blur-sm px-2 py-1 rounded-full"
+                      >3 left</span
+                    >
+                    <span
+                      class="text-xs font-semibold text-green-800 bg-green-200/80 backdrop-blur-sm px-2 py-1 rounded-full"
+                      >available</span
+                    >
+                  </div>
+                </div>
+                <div class="p-4">
+                  <h5 class="font-semibold text-sm truncate">
+                    Clean Code: A Handbook of Agile Software Craftsmanship
+                  </h5>
+                  <p
+                    class="text-xs text-text-light-secondary dark:text-dark-secondary mb-2"
+                  >
+                    by  Robert C. Martin
+                  </p>
+                  <span
+                    class="text-xs text-orange-600 dark:text-orange-400 font-medium"
+                    >Programming</span
+                  >
+                </div>
+              </div>
+              <div
+                class="cursor-pointer group bg-surface-light dark:bg-surface-dark rounded-lg overflow-hidden border border-border-light dark:border-border-dark"
+                onclick="openDSA_Modal()"
+                data-category="Computer Science"
+                data-status="Borrowed"
+              >
+                <div class="relative">
+                  <img
+                    alt="Abstract network of white lines on a black background."
+                    class="w-full h-40 object-cover"
+                    src="../picture image/Introduction_to_Algorithms.jpg"
+                  />
+                  <div class="absolute top-2 right-2 flex items-center gap-1.5">
+                    <span
+                      class="text-xs font-semibold text-slate-700 bg-slate-200/80 backdrop-blur-sm px-2 py-1 rounded-full"
+                      >0 left</span
+                    >
+                    <span
+                      class="text-xs font-semibold text-red-800 bg-red-200/80 backdrop-blur-sm px-2 py-1 rounded-full"
+                      >borrowed</span
+                    >
+                  </div>
+                </div>
+                <div class="p-4">
+                  <h5 class="font-semibold text-sm truncate">
+                    Data Structures and Algorithms
+                  </h5>
+                  <p
+                    class="text-xs text-text-light-secondary dark:text-dark-secondary mb-2"
+                  >
+                     by Thomas H. Cormen
+                  </p>
+                  <span
+                    class="text-xs text-yellow-600 dark:text-yellow-400 font-medium"
+                    >Computer Science</span
+                  >
+                </div>
+              </div>
+              <div
+                class="cursor-pointer group bg-surface-light dark:bg-surface-dark rounded-lg overflow-hidden border border-border-light dark:border-border-dark"
+                onclick="openPhysics_Modal()"
+                data-category="Physics"
+                data-status="Available"
+              >
+                <div class="relative">
+                  <img
+                    alt="A cat looking at an open book."
+                    class="w-full h-40 object-cover"
+                    src="../picture image/modern.jpg"
+                  />
+                  <div class="absolute top-2 right-2 flex items-center gap-1.5">
+                    <span
+                      class="text-xs font-semibold text-slate-700 bg-slate-200/80 backdrop-blur-sm px-2 py-1 rounded-full"
+                      >1 left</span
+                    ><span
+                      class="text-xs font-semibold text-green-800 bg-green-200/80 backdrop-blur-sm px-2 py-1 rounded-full"
+                      >available</span
+                    >
+                  </div>
+                </div>
+                <div class="p-4">
+                  <h5 class="font-semibold text-sm truncate">Modern Physics</h5>
+                  <p
+                    class="text-xs text-text-light-secondary dark:text-dark-secondary mb-2"
+                  >
+                    by Stephen Hawking
+                  </p>
+                  <span
+                    class="text-xs text-blue-600 dark:text-blue-400 font-medium"
+                    >Physics</span
+                  >
+                </div>
+              </div>
+              <div
+                class="cursor-pointer group bg-surface-light dark:bg-surface-dark rounded-lg overflow-hidden border border-border-light dark:border-border-dark"
+                onclick="openFeynman_Modal()"
+              >
+                <div class="relative">
+                  <img
+                    alt="A cat looking at an open book, mirrored image."
+                    class="w-full h-40 object-cover"
+                    src="../picture image/feyman.jpg"
+                  />
+                  <div class="absolute top-2 right-2 flex items-center gap-1.5">
+                    <span
+                      class="text-xs font-semibold text-slate-700 bg-slate-200/80 backdrop-blur-sm px-2 py-1 rounded-full"
+                      >1 left</span
+                    ><span
+                      class="text-xs font-semibold text-green-800 bg-green-200/80 backdrop-blur-sm px-2 py-1 rounded-full"
+                      >available</span
+                    >
+                  </div>
+                </div>
+                <div class="p-4">
+                  <h5 class="font-semibold text-sm truncate">
+                    The Feynman Lectures on Physics
+                  </h5>
+                  <p
+                    class="text-xs text-text-light-secondary dark:text-dark-secondary mb-2"
+                  >
+                    by Richard P. Feynman
+                  </p>
+                  <span
+                    class="text-xs text-purple-600 dark:text-purple-400 font-medium"
+                    >Physics</span
+                  >
+                </div>
+              </div>
+              <div
+                class="cursor-pointer group bg-surface-light dark:bg-surface-dark rounded-lg overflow-hidden border border-border-light dark:border-border-dark"
+                onclick="openStructure_Modal()"
+                data-category="Mathematics"
+                data-status="Available"
+              >
+                <div class="relative">
+                  <img
+                    alt="A book titled 'Open-ended Maths Activities'."
+                    class="w-full h-40 object-cover"
+                    src="../picture image/OIP.jpg"
+                  />
+                  <div class="absolute top-2 right-2 flex items-center gap-1.5">
+                    <span
+                      class="text-xs font-semibold text-slate-700 bg-slate-200/80 backdrop-blur-sm px-2 py-1 rounded-full"
+                      >2 left</span
+                    >
+                    <span
+                      class="text-xs font-semibold text-green-800 bg-green-200/80 backdrop-blur-sm px-2 py-1 rounded-full"
+                      >available</span
+                    >
+                  </div>
+                </div>
+                <div class="p-4">
+                  <h5 class="font-semibold text-sm truncate">The Structure of Scientific Revolutions</h5>
+                  <p
+                    class="text-xs text-text-light-secondary dark:text-dark-secondary mb-2"
+                  >
+                    by Thomas S. Kuhn and Ian Hacking
+                  </p>
+                  <span
+                    class="text-xs text-teal-600 dark:text-teal-400 font-medium"
+                    >Mathematics</span
+                  >
+                </div>
+              </div>
+              <div
+                class="cursor-pointer group bg-surface-light dark:bg-surface-dark rounded-lg overflow-hidden border border-border-light dark:border-border-dark"
+                onclick="openEdison_Modal()"
+                data-category="History"
+                data-status="Available"
+              >
+                <div class="relative">
+                  <img
+                    alt="A library aisle with many books on shelves."
+                    class="w-full h-40 object-cover"
+                    src="../picture image/Story.jpg"
+                  />
+                  <div class="absolute top-2 right-2 flex items-center gap-1.5">
+                    <span
+                      class="text-xs font-semibold text-slate-700 bg-slate-200/80 backdrop-blur-sm px-2 py-1 rounded-full"
+                      >4 left</span
+                    ><span
+                      class="text-xs font-semibold text-green-800 bg-green-200/80 backdrop-blur-sm px-2 py-1 rounded-full"
+                      >available</span
+                    >
+                  </div>
+                </div>
+                <div class="p-4">
+                  <h5 class="font-semibold text-sm truncate">The Story of Thomas A. Edison</h5>
+                  <p
+                    class="text-xs text-text-light-secondary dark:text-dark-secondary mb-2"
+                  >
+                    by Frances M. Perry
+                  </p>
+                  <span
+                    class="text-xs text-rose-600 dark:text-rose-400 font-medium"
+                    >History</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      <div
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none"
+      id="bookDetailModal"
+      style="z-index: 50"
+    >
+      <div>
+        <div class="bg-slate-50 dark:bg-slate-900 rounded-lg">
+          <div class="p-6">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-start gap-4">
+                <img
+                  alt="An open book showing pages of text."
+                  class="w-16 h-20 object-cover rounded shadow-md flex-shrink-0"
+                  src="../picture image/Clean Code_ A Handbook of Agile Software Craftsmanship.jpg"
+                />
+                <div>
+                  <span
+                    class="text-xs font-semibold text-green-800 bg-green-200 dark:bg-green-900/50 dark:text-green-300 px-2 py-0.5 rounded-full mb-1 inline-block"
+                    >available</span
+                  >
+                  <h3
+                    class="text-lg font-bold text-text-light-primary dark:text-dark-primary"
+                  >
+                    Clean Code: A Handbook of Agile Software Craftsmanship
+                  </h3>
+                  <p
+                    class="text-sm text-text-light-secondary dark:text-dark-secondary"
+                  >
+                    by Robert C. Martin
+                  </p>
+                </div>
+              </div>
+              <button
+                  class="text-text-light-secondary dark:text-dark-secondary hover:text-gray-400 dark:hover:text-gray-400"
+                  onclick="closeModal()"
+                  >
+                <span class="material-icons-outlined">close</span>
+              </button>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+                <p
+                  class="text-xs font-medium text-amber-700 dark:text-amber-300 mb-1"
+                >
+                  Availability
+                </p>
+                <p
+                  class="font-bold text-text-light-primary dark:text-dark-primary"
+                >
+                  0 of 3
+                  <br>
+                  <span class="font-normal text-sm">copies available</span>
+                </p>
+              </div>
+              <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+                <p
+                  class="text-xs font-medium text-amber-700 dark:text-amber-300 mb-1"
+                >
+                  Location
+                </p>
+                <p
+                  class="font-bold text-text-light-primary dark:text-dark-primary"
+                >
+                  Section A, Shelf 3
+                  <br>
+                  <span class="font-normal text-sm">in library</span>
+                </p>
+              </div>
+            </div>
+            <div
+              class="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-lg mb-4 space-y-3"
+            >
+              <h4
+                class="text-sm font-semibold text-text-light-secondary dark:text-dark-secondary"
+              >
+                Book Information
+              </h4>
+              <div class="grid grid-cols-3 gap-x-4 gap-y-2 text-sm">
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1"
+                  >Book ID:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2"
+                ></span>
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1"
+                  >ISBN:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2 text-right"
+                  >978-0-123456-79-6</span
+                >
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1 "
+                  >Category:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2 text-right"
+                  >Computer Science</span
+                >
+              </div>
+            </div>
+            <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+              <h4
+                class="text-sm font-semibold text-amber-700 dark:text-amber-300 mb-1"
+              >
+                Description
+              </h4>
+              <p class="text-sm text-text-light-primary dark:text-dark-primary">
+                A comprehensive introduction to computer science fundamentals.
+              </p>
+            </div>
+          </div>
+          <div class="p-6 border-t border-slate-200 dark:border-slate-800">
+            <button
+              class="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center justify-center gap-2"
+              onclick="borrowBook('Clean Code: A Handbook of Agile Software Craftsmanship')"
+            >
+              <span class="material-icons-outlined">add_shopping_cart</span>
+              Borrow Book
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none"
+      id="dsaModal"
+      style="z-index: 50"
+    >
+      <div>
+        <div class="bg-slate-50 dark:bg-slate-900 rounded-lg">
+          <div class="p-6">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-start gap-4">
+                <img
+                  alt="Abstract network of white lines on a black background."
+                  class="w-16 h-20 object-cover rounded shadow-md flex-shrink-0"
+                  src="../picture image/Introduction_to_Algorithms.jpg"
+                />
+                <div>
+                  <span
+                    class="text-xs font-semibold text-green-800 bg-green-200 dark:bg-green-900/50 dark:text-green-300 px-2 py-0.5 rounded-full mb-1 inline-block"
+                    >available</span
+                  >
+                  <h3
+                    class="text-lg font-bold text-text-light-primary dark:text-dark-primary"
+                  >
+                    Data Structures and Algorithms
+                  </h3>
+                  <p
+                    class="text-sm text-text-light-secondary dark:text-dark-secondary"
+                  >
+                    by Thomas H. Cormen
+                  </p>
+                </div>
+              </div>
+              <button
+                  class="text-text-light-secondary dark:text-dark-secondary hover:text-gray-400 dark:hover:text-gray-400"
+                  onclick="closeDSA_Modal()" 
+                  >
+                <span class="material-icons-outlined">close</span>
+              </button>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+                <p
+                  class="text-xs font-medium text-amber-700 dark:text-amber-300 mb-1"
+                >
+                  Availability
+                </p>
+                <p
+                  class="font-bold text-text-light-primary dark:text-dark-primary"
+                >
+                  0 of 3
+                  <br>
+                  <span class="font-normal text-sm">copies available</span>
+                </p>
+              </div>
+              <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+                <p
+                  class="text-xs font-medium text-amber-700 dark:text-amber-300 mb-1"
+                >
+                  Location
+                </p>
+                <p
+                  class="font-bold text-text-light-primary dark:text-dark-primary"
+                >
+                  Section A, Shelf 3
+                  <br>
+                  <span class="font-normal text-sm">in library</span>
+                </p>
+              </div>
+            </div>
+            <div
+              class="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-lg mb-4 space-y-3"
+            >
+              <h4
+                class="text-sm font-semibold text-text-light-secondary dark:text-dark-secondary"
+              >
+                Book Information
+              </h4>
+              <div class="grid grid-cols-3 gap-x-4 gap-y-2 text-sm">
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1"
+                  >Book ID:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2"
+                ></span>
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1"
+                  >ISBN:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2 text-right"
+                  >978-0-123456-79-6</span
+                >
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1 "
+                  >Category:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2 text-right"
+                  >Computer Science</span
+                >
+              </div>
+            </div>
+            <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+              <h4
+                class="text-sm font-semibold text-amber-700 dark:text-amber-300 mb-1"
+              >
+                Description
+              </h4>
+              <p class="text-sm text-text-light-primary dark:text-dark-primary">
+                A comprehensive introduction to computer science fundamentals.
+              </p>
+            </div>
+          </div>
+          <div class="p-6 border-t border-slate-200 dark:border-slate-800">
+            <button
+              class="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center justify-center gap-2"
+              onclick="borrowBook('Data Structures and Algorithms')"
+            >
+              <span class="material-icons-outlined">add_shopping_cart</span>
+              Borrow Book
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none"
+      id="physicsModal"
+      style="z-index: 50"
+    >
+      <div>
+        <div class="bg-slate-50 dark:bg-slate-900 rounded-lg">
+          <div class="p-6">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-start gap-4">
+                <img
+                  alt="A cat looking at an open book."
+                  class="w-16 h-20 object-cover rounded shadow-md flex-shrink-0"
+                  src="../picture image/modern.jpg"
+                />
+                <div>
+                  <span
+                    class="text-xs font-semibold text-green-800 bg-green-200 dark:bg-green-900/50 dark:text-green-300 px-2 py-0.5 rounded-full mb-1 inline-block"
+                    >available</span
+                  >
+                  <h3
+                    class="text-lg font-bold text-text-light-primary dark:text-dark-primary"
+                  >
+                    Modern Physics
+                  </h3>
+                  <p
+                    class="text-sm text-text-light-secondary dark:text-dark-secondary"
+                  >
+                    by Stephen Hawking
+                  </p>
+                </div>
+              </div>
+              <button
+                  class="text-text-light-secondary dark:text-dark-secondary hover:text-gray-400 dark:hover:text-gray-400"
+                  onclick="closePhysics_Modal()"
+                  >
+                <span class="material-icons-outlined">close</span>
+              </button>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+                <p
+                  class="text-xs font-medium text-amber-700 dark:text-amber-300 mb-1"
+                >
+                  Availability
+                </p>
+                <p
+                  class="font-bold text-text-light-primary dark:text-dark-primary"
+                >
+                  1 of 5
+                  <br>
+                  <span class="font-normal text-sm">copies available</span>
+                </p>
+              </div>
+              <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+                <p
+                  class="text-xs font-medium text-amber-700 dark:text-amber-300 mb-1"
+                >
+                  Location
+                </p>
+                <p
+                  class="font-bold text-text-light-primary dark:text-dark-primary"
+                >
+                  Section B, Shelf 1
+                  <br>
+                  <span class="font-normal text-sm">in library</span>
+                </p>
+              </div>
+            </div>
+            <div
+              class="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-lg mb-4 space-y-3"
+            >
+              <h4
+                class="text-sm font-semibold text-text-light-secondary dark:text-dark-secondary"
+              >
+                Book Information
+              </h4>
+              <div class="grid grid-cols-3 gap-x-4 gap-y-2 text-sm">
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1"
+                  >Book ID:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2"
+                ></span>
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1"
+                  >ISBN:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2 text-right"
+                  >978-0-553-38016-9</span
+                >
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1 "
+                  >Category:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2 text-right"
+                  >Physics</span
+                >
+              </div>
+            </div>
+            <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+              <h4
+                class="text-sm font-semibold text-amber-700 dark:text-amber-300 mb-1"
+              >
+                Description
+              </h4>
+              <p class="text-sm text-text-light-primary dark:text-dark-primary">
+                A comprehensive introduction to modern physics concepts.
+              </p>
+            </div>
+          </div>
+          <div class="p-6 border-t border-slate-200 dark:border-slate-800">
+            <button
+              class="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center justify-center gap-2"
+              onclick="borrowBook('Modern Physics')"
+            >
+              <span class="material-icons-outlined">add_shopping_cart</span>
+              Borrow Book
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none"
+      id="feynmanModal"
+      style="z-index: 50"
+    >
+      <div>
+        <div class="bg-slate-50 dark:bg-slate-900 rounded-lg">
+          <div class="p-6">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-start gap-4">
+                <img
+                  alt="A cat looking at an open book, mirrored image."
+                  class="w-16 h-20 object-cover rounded shadow-md flex-shrink-0"
+                  src="../picture image/feyman.jpg"
+                />
+                <div>
+                  <span
+                    class="text-xs font-semibold text-green-800 bg-green-200 dark:bg-green-900/50 dark:text-green-300 px-2 py-0.5 rounded-full mb-1 inline-block"
+                    >available</span
+                  >
+                  <h3
+                    class="text-lg font-bold text-text-light-primary dark:text-dark-primary"
+                  >
+                    The Feynman Lectures on Physics
+                  </h3>
+                  <p
+                    class="text-sm text-text-light-secondary dark:text-dark-secondary"
+                  >
+                    by Richard P. Feynman
+                  </p>
+                </div>
+              </div>
+              <button
+                  class="text-text-light-secondary dark:text-dark-secondary hover:text-gray-400 dark:hover:text-gray-400"
+                  onclick="closeFeynman_Modal()"
+                  >
+                <span class="material-icons-outlined">close</span>
+              </button>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+                <p
+                  class="text-xs font-medium text-amber-700 dark:text-amber-300 mb-1"
+                >
+                  Availability
+                </p>
+                <p
+                  class="font-bold text-text-light-primary dark:text-dark-primary"
+                >
+                  1 of 4
+                  <br>
+                  <span class="font-normal text-sm">copies available</span>
+                </p>
+              </div>
+              <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+                <p
+                  class="text-xs font-medium text-amber-700 dark:text-amber-300 mb-1"
+                >
+                  Location
+                </p>
+                <p
+                  class="font-bold text-text-light-primary dark:text-dark-primary"
+                >
+                  Section C, Shelf 2
+                  <br>
+                  <span class="font-normal text-sm">in library</span>
+                </p>
+              </div>
+            </div>
+            <div
+              class="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-lg mb-4 space-y-3"
+            >
+              <h4
+                class="text-sm font-semibold text-text-light-secondary dark:text-dark-secondary"
+              >
+                Book Information
+              </h4>
+              <div class="grid grid-cols-3 gap-x-4 gap-y-2 text-sm">
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1"
+                  >Book ID:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2"
+                ></span>
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1"
+                  >ISBN:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2 text-right"
+                  >978-0-465-02493-0</span
+                >
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1 "
+                  >Category:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2 text-right"
+                  >Physics</span
+                >
+              </div>
+            </div>
+            <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+              <h4
+                class="text-sm font-semibold text-amber-700 dark:text-amber-300 mb-1"
+              >
+                Description
+              </h4>
+              <p class="text-sm text-text-light-primary dark:text-dark-primary">
+                A comprehensive set of lectures on physics fundamentals.
+              </p>
+            </div>
+          </div>
+          <div class="p-6 border-t border-slate-200 dark:border-slate-800">
+            <button
+              class="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center justify-center gap-2"
+              onclick="borrowBook('The Feynman Lectures on Physics')"
+            >
+              <span class="material-icons-outlined">add_shopping_cart</span>
+              Borrow Book
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none"
+      id="structureModal"
+      style="z-index: 50"
+    >
+      <div>
+        <div class="bg-slate-50 dark:bg-slate-900 rounded-lg">
+          <div class="p-6">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-start gap-4">
+                <img
+                  alt="A book titled 'Open-ended Maths Activities'."
+                  class="w-16 h-20 object-cover rounded shadow-md flex-shrink-0"
+                  src="../picture image/OIP.jpg"
+                />
+                <div>
+                  <span
+                    class="text-xs font-semibold text-green-800 bg-green-200 dark:bg-green-900/50 dark:text-green-300 px-2 py-0.5 rounded-full mb-1 inline-block"
+                    >available</span
+                  >
+                  <h3
+                    class="text-lg font-bold text-text-light-primary dark:text-dark-primary"
+                  >
+                    The Structure of Scientific Revolutions
+                  </h3>
+                  <p
+                    class="text-sm text-text-light-secondary dark:text-dark-secondary"
+                  >
+                    by Thomas S. Kuhn and Ian Hacking
+                  </p>
+                </div>
+              </div>
+              <button
+                  class="text-text-light-secondary dark:text-dark-secondary hover:text-gray-400 dark:hover:text-gray-400"
+                  onclick="closeStructure_Modal()"
+                  >
+                <span class="material-icons-outlined">close</span>
+              </button>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+                <p
+                  class="text-xs font-medium text-amber-700 dark:text-amber-300 mb-1"
+                >
+                  Availability
+                </p>
+                <p
+                  class="font-bold text-text-light-primary dark:text-dark-primary"
+                >
+                  2 of 6
+                  <br>
+                  <span class="font-normal text-sm">copies available</span>
+                </p>
+              </div>
+              <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+                <p
+                  class="text-xs font-medium text-amber-700 dark:text-amber-300 mb-1"
+                >
+                  Location
+                </p>
+                <p
+                  class="font-bold text-text-light-primary dark:text-dark-primary"
+                >
+                  Section D, Shelf 4
+                  <br>
+                  <span class="font-normal text-sm">in library</span>
+                </p>
+              </div>
+            </div>
+            <div
+              class="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-lg mb-4 space-y-3"
+            >
+              <h4
+                class="text-sm font-semibold text-text-light-secondary dark:text-dark-secondary"
+              >
+                Book Information
+              </h4>
+              <div class="grid grid-cols-3 gap-x-4 gap-y-2 text-sm">
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1"
+                  >Book ID:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2"
+                ></span>
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1"
+                  >ISBN:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2 text-right"
+                  >978-0-226-45812-0</span
+                >
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1 "
+                  >Category:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2 text-right"
+                  >Philosophy of Science</span
+                >
+              </div>
+            </div>
+            <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+              <h4
+                class="text-sm font-semibold text-amber-700 dark:text-amber-300 mb-1"
+              >
+                Description
+              </h4>
+              <p class="text-sm text-text-light-primary dark:text-dark-primary">
+                A seminal work on the history and philosophy of science.
+              </p>
+            </div>
+          </div>
+          <div class="p-6 border-t border-slate-200 dark:border-slate-800">
+            <button
+              class="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center justify-center gap-2"
+              onclick="borrowBook('The Structure of Scientific Revolutions')"
+            >
+              <span class="material-icons-outlined">add_shopping_cart</span>
+              Borrow Book
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="fixed inset-0 bg-black/60 backdrop-blur-sm flex justify-center items-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none"
+      id="edisonModal"
+      style="z-index: 50"
+    >
+      <div>
+        <div class="bg-slate-50 dark:bg-slate-900 rounded-lg">
+          <div class="p-6">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex items-start gap-4">
+                <img
+                  alt="A library aisle with many books on shelves."
+                  class="w-16 h-20 object-cover rounded shadow-md flex-shrink-0"
+                  src="../picture image/Story.jpg"
+                />
+                <div>
+                  <span
+                    class="text-xs font-semibold text-green-800 bg-green-200 dark:bg-green-900/50 dark:text-green-300 px-2 py-0.5 rounded-full mb-1 inline-block"
+                    >available</span
+                  >
+                  <h3
+                    class="text-lg font-bold text-text-light-primary dark:text-dark-primary"
+                  >
+                    The Story of Thomas A. Edison
+                  </h3>
+                  <p
+                    class="text-sm text-text-light-secondary dark:text-dark-secondary"
+                  >
+                    by Frances M. Perry
+                  </p>
+                </div>
+              </div>
+              <button
+                  class="text-text-light-secondary dark:text-dark-secondary hover:text-gray-400 dark:hover:text-gray-400"
+                  onclick="closeEdison_Modal()"
+                  >
+                <span class="material-icons-outlined">close</span>
+              </button>
+            </div>
+            <div class="grid grid-cols-2 gap-4 mb-4">
+              <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+                <p
+                  class="text-xs font-medium text-amber-700 dark:text-amber-300 mb-1"
+                >
+                  Availability
+                </p>
+                <p
+                  class="font-bold text-text-light-primary dark:text-dark-primary"
+                >
+                  4 of 8
+                  <br>
+                  <span class="font-normal text-sm">copies available</span>
+                </p>
+              </div>
+              <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+                <p
+                  class="text-xs font-medium text-amber-700 dark:text-amber-300 mb-1"
+                >
+                  Location
+                </p>
+                <p
+                  class="font-bold text-text-light-primary dark:text-dark-primary"
+                >
+                  Section E, Shelf 5
+                  <br>
+                  <span class="font-normal text-sm">in library</span>
+                </p>
+              </div>
+            </div>
+            <div
+              class="bg-slate-100 dark:bg-slate-800/50 p-4 rounded-lg mb-4 space-y-3"
+            >
+              <h4
+                class="text-sm font-semibold text-text-light-secondary dark:text-dark-secondary"
+              >
+                Book Information
+              </h4>
+              <div class="grid grid-cols-3 gap-x-4 gap-y-2 text-sm">
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1"
+                  >Book ID:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2"
+                ></span>
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1"
+                  >ISBN:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2 text-right"
+                  >978-0-486-28246-0</span
+                >
+                <span
+                  class="text-text-light-secondary dark:text-dark-secondary col-span-1 "
+                  >Category:</span
+                >
+                <span
+                  class="font-medium text-text-light-primary dark:text-dark-primary col-span-2 text-right"
+                  >Biography</span
+                >
+              </div>
+            </div>
+            <div class="bg-amber-100 dark:bg-amber-900/40 p-4 rounded-lg">
+              <h4
+                class="text-sm font-semibold text-amber-700 dark:text-amber-300 mb-1"
+              >
+                Description
+              </h4>
+              <p class="text-sm text-text-light-primary dark:text-dark-primary">
+                A biography of the famous inventor Thomas A. Edison.
+              </p>
+            </div>
+          </div>
+          <div class="p-6 border-t border-slate-200 dark:border-slate-800">
+            <button
+              class="w-full bg-gradient-to-r from-green-500 to-teal-500 text-white font-bold py-3 px-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center justify-center gap-2"
+              onclick="borrowBook('The Story of Thomas A. Edison')"
+            >
+              <span class="material-icons-outlined">add_shopping_cart</span>
+              Borrow Book
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+        <footer class="h-14 flex items-center justify-between px-8 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700">
+          <div class="flex items-center text-sm">
+            <span class="material-icons text-orange-500 mr-2"></span>
+            <span class="font-medium text-slate-800 dark:text-slate-100">OMSC Library</span>
+          </div>
+          <div class="text-sm text-slate-500 dark:text-slate-400 space-x-4">
+            <span>© 2025 OMSC Library</span>
+            <a class="hover:text-primary" href="privacy.html">Privacy</a>
+            <a class="hover:text-primary" href="terms.html">Terms</a>
+          </div>
+        </footer>
+      </div>
+    </div>
+    <script>
+      const modal = document.getElementById("bookDetailModal");
+      const modalContent = modal.querySelector("div");
+      const dsaModal = document.getElementById("dsaModal");
+      const dsaModalContent = dsaModal.querySelector("div");
+      const physicsModal = document.getElementById("physicsModal");
+      const physicsModalContent = physicsModal.querySelector("div");
+      const feynmanModal = document.getElementById("feynmanModal");
+      const feynmanModalContent = feynmanModal.querySelector("div");
+      const structureModal = document.getElementById("structureModal");
+      const structureModalContent = structureModal.querySelector("div");
+      const edisonModal = document.getElementById("edisonModal");
+      const edisonModalContent = edisonModal.querySelector("div");
+      
+      function openModal() {
+        modal.classList.remove("opacity-0", "pointer-events-none");
+        modalContent.classList.remove("scale-95");
+      }
+      function closeModal() {
+        modal.classList.add("opacity-0");
+        modalContent.classList.add("scale-95");
+        setTimeout(() => {
+          modal.classList.add("pointer-events-none");
+        }, 300); // Wait for transition to finish
+      }
+      function openDSA_Modal() {
+        dsaModal.classList.remove("opacity-0", "pointer-events-none");
+        dsaModalContent.classList.remove("scale-95");
+      }
+      function closeDSA_Modal() {
+        dsaModal.classList.add("opacity-0");
+        dsaModalContent.classList.add("scale-95");
+        setTimeout(() => {
+          dsaModal.classList.add("pointer-events-none");
+        }, 300); // Wait for transition to finish
+      }
+      function openPhysics_Modal() {
+        physicsModal.classList.remove("opacity-0", "pointer-events-none");
+        physicsModalContent.classList.remove("scale-95");
+      }
+      function closePhysics_Modal() {
+        physicsModal.classList.add("opacity-0");
+        physicsModalContent.classList.add("scale-95");
+        setTimeout(() => {
+          physicsModal.classList.add("pointer-events-none");
+        }, 300); // Wait for transition to finish
+      }
+      function openFeynman_Modal() {
+        feynmanModal.classList.remove("opacity-0", "pointer-events-none");
+        feynmanModalContent.classList.remove("scale-95");
+      }
+      function closeFeynman_Modal() {
+        feynmanModal.classList.add("opacity-0");
+        feynmanModalContent.classList.add("scale-95");
+        setTimeout(() => {
+          feynmanModal.classList.add("pointer-events-none");
+        }, 300); // Wait for transition to finish
+      }
+      function openStructure_Modal() {
+        structureModal.classList.remove("opacity-0", "pointer-events-none");
+        structureModalContent.classList.remove("scale-95");
+      }
+      function closeStructure_Modal() {
+        structureModal.classList.add("opacity-0");
+        structureModalContent.classList.add("scale-95");
+        setTimeout(() => {
+          structureModal.classList.add("pointer-events-none");
+        }, 300); // Wait for transition to finish
+      }
+      function openEdison_Modal() {
+        edisonModal.classList.remove("opacity-0", "pointer-events-none");
+        edisonModalContent.classList.remove("scale-95");
+      }
+      function closeEdison_Modal() {
+        edisonModal.classList.add("opacity-0");
+        edisonModalContent.classList.add("scale-95");
+        setTimeout(() => {
+          edisonModal.classList.add("pointer-events-none");
+        }, 300); // Wait for transition to finish
+      }
+      // Close modal on outside click
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+          closeModal();
+        }
+      });
+      dsaModal.addEventListener("click", (event) => {
+        if (event.target === dsaModal) {
+          closeDSA_Modal();
+        }
+      });
+      physicsModal.addEventListener("click", (event) => {
+        if (event.target === physicsModal) {
+          closePhysics_Modal();
+        }
+      });
+      feynmanModal.addEventListener("click", (event) => {
+        if (event.target === feynmanModal) {
+          closeFeynman_Modal();
+        }
+      });
+      structureModal.addEventListener("click", (event) => {
+        if (event.target === structureModal) {
+          closeStructure_Modal();
+        }
+      });
+      edisonModal.addEventListener("click", (event) => {
+        if (event.target === edisonModal) {
+          closeEdison_Modal();
+        }
+      });
+      // Close modal on Escape key press
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+          closeModal();
+          closeDSA_Modal();
+          closePhysics_Modal();
+          closeFeynman_Modal();
+          closeStructure_Modal();
+          closeEdison_Modal();
+        }
+      });
+
+      // Filtering functionality
+      const searchInput = document.getElementById('search-input');
+      const categorySelect = document.getElementById('category-select');
+      const statusSelect = document.getElementById('status-select');
+      const bookGrid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.md\\:grid-cols-3.lg\\:grid-cols-4.xl\\:grid-cols-6');
+      const booksFoundElement = document.querySelector('h4.font-bold.text-lg');
+      const availableCountElement = document.querySelector('span.text-green-600.font-semibold');
+      const noBooksMessage = document.createElement('div');
+      noBooksMessage.className = 'text-center py-8 text-slate-500 dark:text-slate-400';
+      noBooksMessage.innerHTML = '<p>No books found matching your criteria.</p>';
+      noBooksMessage.id = 'no-books-message';
+      noBooksMessage.style.display = 'none';
+      bookGrid.parentNode.insertBefore(noBooksMessage, bookGrid.nextSibling);
+
+      function filterBooks() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedCategory = categorySelect.value;
+        const selectedStatus = statusSelect.value;
+        const books = document.querySelectorAll('[data-category]');
+        let visibleCount = 0;
+        let availableCount = 0;
+
+        books.forEach(book => {
+          const category = book.getAttribute('data-category');
+          const status = book.getAttribute('data-status');
+          const title = book.querySelector('h5').textContent.toLowerCase();
+          const author = book.querySelector('p').textContent.toLowerCase();
+
+          const matchesSearch = title.includes(searchTerm) || author.includes(searchTerm);
+          const matchesCategory = selectedCategory === 'All Categories' || category === selectedCategory;
+          const matchesStatus = selectedStatus === 'All Status' || status === selectedStatus;
+
+          if (matchesSearch && matchesCategory && matchesStatus) {
+            book.style.display = '';
+            visibleCount++;
+            if (status === 'Available') availableCount++;
+          } else {
+            book.style.display = 'none';
+          }
+        });
+
+        // Update counts
+        booksFoundElement.textContent = `${visibleCount} Books Found`;
+        availableCountElement.textContent = `Available: ${availableCount}`;
+
+        // Show/hide no books message
+        if (visibleCount === 0) {
+          noBooksMessage.style.display = 'block';
+        } else {
+          noBooksMessage.style.display = 'none';
+        }
+      }
+
+      // Add event listeners
+      searchInput.addEventListener('input', filterBooks);
+      categorySelect.addEventListener('change', filterBooks);
+      statusSelect.addEventListener('change', filterBooks);
+
+      // Initial filter
+      filterBooks();
+
+      // Borrow book function
+      function borrowBook(bookTitle) {
+        alert(bookTitle + ' is in cart');
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        if (!cart.includes(bookTitle)) {
+          cart.push(bookTitle);
+          localStorage.setItem('cart', JSON.stringify(cart));
+        }
+        window.location.href = 'cart.html';
+      }
+    </script>
+  </body>
+</html>

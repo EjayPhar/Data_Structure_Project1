@@ -1,0 +1,406 @@
+ <?php
+session_start();
+include '../login/db_connect.php';
+
+// Check if user is logged in and is staff
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['librarian', 'staff'])) {
+    header("Location: ../login/login.html");
+    exit();
+}
+
+// Get dashboard statistics
+$today = date('Y-m-d');
+
+// Books borrowed today
+$borrowed_today_sql = "SELECT COUNT(*) as count FROM borrowings WHERE DATE(borrow_date) = ?";
+$borrowed_today_stmt = $conn->prepare($borrowed_today_sql);
+$borrowed_today_stmt->bind_param("s", $today);
+$borrowed_today_stmt->execute();
+$borrowed_today_result = $borrowed_today_stmt->get_result();
+$borrowed_today = $borrowed_today_result->fetch_assoc()['count'];
+
+// Overdue books (either flagged overdue, or past due and still borrowed)
+$overdue_sql = "SELECT COUNT(*) AS count FROM borrowings WHERE status = 'overdue' OR (status = 'borrowed' AND due_date < CURDATE())";
+$overdue_result = $conn->query($overdue_sql);
+$overdue_row = $overdue_result ? $overdue_result->fetch_assoc() : ['count' => 0];
+$overdue_count = (int)($overdue_row['count'] ?? 0);
+
+// Days visited this month (distinct visitors from attendance)
+$days_visited_sql = "SELECT COUNT(DISTINCT user_id) AS count FROM attendance WHERE check_in_date >= DATE_FORMAT(CURDATE(), '%Y-%m-01')";
+$days_visited_result = $conn->query($days_visited_sql);
+$days_row = $days_visited_result ? $days_visited_result->fetch_assoc() : ['count' => 0];
+$days_visited = (int)($days_row['count'] ?? 0);
+
+// Get currently borrowed books
+$current_borrowings_sql = "SELECT b.title, b.author, br.due_date, br.status
+                          FROM borrowings br
+                          JOIN books b ON br.book_id = b.id
+                          WHERE br.status IN ('borrowed', 'overdue')
+                          ORDER BY br.due_date ASC
+                          LIMIT 10";
+$current_borrowings_result = $conn->query($current_borrowings_sql);
+$current_borrowings = $current_borrowings_result ? $current_borrowings_result->fetch_all(MYSQLI_ASSOC) : [];
+?>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Librarian Dashboard</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+     <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#31694E",
+              "background-light": "#f8fafc",
+              "background-dark": "#1e293b",
+            },
+            fontFamily: {
+              display: ["Poppins", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+            },
+          },
+        },
+      };
+    </script>
+    <script>
+      // Auto highlight active sidebar link
+      (function () {
+        var links = document.querySelectorAll('aside nav a');
+        var current = location.pathname.split('/').pop();
+        if (!current) current = 'librarian-dashboard.php';
+        links.forEach(function (a) {
+          var href = a.getAttribute('href');
+          if (!href) return;
+          var name = href.split('/').pop();
+          if (!name) return;
+          if (name === current) {
+            a.classList.add('bg-primary', 'text-white');
+            a.setAttribute('aria-current', 'page');
+          } else {
+            a.classList.remove('bg-primary', 'text-white');
+            a.removeAttribute('aria-current');
+          }
+        });
+      })();
+    </script>
+    <script>
+      // Sidebar toggle for small screens (show/hide with backdrop)
+      (function () {
+        var btn = document.getElementById('menu-btn');
+        var closeBtn = document.getElementById('menu-close');
+        var sidebar = document.querySelector('aside');
+        var backdrop = document.getElementById('backdrop');
+
+        function showSidebar() {
+          sidebar.classList.remove('-translate-x-full');
+          sidebar.classList.add('translate-x-0');
+          backdrop.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+          if (btn) btn.setAttribute('aria-expanded', 'true');
+        }
+
+        function hideSidebar() {
+          sidebar.classList.add('-translate-x-full');
+          sidebar.classList.remove('translate-x-0');
+          backdrop.classList.add('hidden');
+          document.body.style.overflow = '';
+          if (btn) btn.setAttribute('aria-expanded', 'false');
+        }
+
+        document.addEventListener('keydown', function (ev) {
+          if (ev.key === 'Escape' && window.innerWidth < 768) hideSidebar();
+        });
+
+        if (btn && sidebar && backdrop) btn.addEventListener('click', showSidebar);
+        if (closeBtn && sidebar && backdrop) closeBtn.addEventListener('click', hideSidebar);
+        if (backdrop) backdrop.addEventListener('click', hideSidebar);
+      })();
+    </script>
+  </head>
+  <body
+    class="font-display bg-background-light dark:bg-background-dark text-slate-700 dark:text-slate-300"
+  >
+    <div class="flex h-screen">
+      <div id="backdrop" class="fixed inset-0 bg-black/40 z-40 hidden md:hidden"></div>
+      <aside id="sidebar"
+        class="fixed inset-y-0 left-0 z-50 w-64 transform -translate-x-full md:translate-x-0 md:static md:flex bg-slate-50 dark:bg-slate-800 flex flex-col border-r border-slate-200 dark:border-slate-700 transition-transform duration-200"
+      >
+        <div
+          class="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-700"
+        >
+          <span class="material-icons text-primary mr-2">school</span>
+          <span class="font-bold text-lg text-slate-800 dark:text-slate-100"
+            >Library System</span
+          >
+          <button id="menu-close" class="md:hidden p-2 text-slate-500 dark:text-slate-300 hover:text-slate-700 dark:hover:text-slate-200 ml-auto">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+          <a
+            class="flex items-center px-4 py-2 text-sm font-medium bg-primary text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md"
+            href="librarian-dashboard.php"
+          >
+            <span class="material-icons mr-3">dashboard</span>
+            Dashboard
+          </a>
+          <a
+            class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md"
+            href="Book_Management.php"
+          >
+            <span class="material-icons mr-3">menu_book</span>
+            Book Management
+          </a>
+          <a
+            class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md"
+            href="user-management.php"
+          >
+            <span class="material-icons mr-3">group</span>
+            User Management
+          </a>
+          <a
+            class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md"
+            href="borrow.php"
+          >
+            <span class="material-icons mr-3">history</span>
+            Borrowing History
+          </a>
+          <a class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md" href="overdue-alerts.php">
+            <span class="material-icons mr-3">warning</span>
+            Overdue Alerts
+          </a>
+          <a class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md" href="backup_restore.php">
+            <span class="material-icons mr-3">backup</span>
+            Backup & Restore
+          </a>
+          <a class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md" href="Attendance-logs.php">
+            <span class="material-icons mr-3">event_available</span>
+            Attendance Logs
+          </a>
+          <a class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md" href="change-password.php">
+            <span class="material-icons mr-3">lock</span>
+            Change Password
+          </a>
+        </nav>
+      </aside>
+      <div class="flex-1 flex flex-col">
+        <header class="h-16 flex items-center justify-between px-8 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+          <div class="flex items-center md:hidden mr-4">
+            <button id="menu-btn" aria-expanded="false" class="p-2 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100" aria-label="Open sidebar">
+              <span class="material-icons">menu</span>
+            </button>
+          </div>
+          <h1 class="text-xl font-semibold text-slate-800 dark:text-slate-100">Librarian Dashboard</h1>
+          <div class="flex items-center gap-4">
+            <div class="text-right">
+              <p class="font-medium text-sm text-slate-800 dark:text-slate-100"><?php echo htmlspecialchars($_SESSION['username']); ?></p>
+              <p class="text-xs text-slate-500 dark:text-slate-400"><?php echo htmlspecialchars($_SESSION['email']); ?></p>
+            </div>
+            <button onclick="window.location.href='../login/logout.php'" 
+    class="ml-4 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
+    <span class="material-icons">logout</span>
+</button>
+
+          </div>
+        </header>
+        <main class="flex-1 p-8 overflow-y-auto">
+          <div class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-white">
+              Welcome back, <?php echo htmlspecialchars($_SESSION['username']); ?>!
+            </h2>
+            <p class="text-gray-500 dark:text-gray-400">
+              Here's your library overview for today.
+            </p>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div
+              class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border-l-4 border-blue-400
+          transition duration-200 hover:bg-blue-50 dark:hover:bg-gray-700 hover:shadow-md hover:-translate-y-1"
+          >
+              <div class="flex justify-between items-start">
+                <p class="text-gray-500 dark:text-gray-400">Books Borrowed Today</p>
+                <span class="material-symbols-outlined text-blue-500"
+                  >auto_stories</span
+                >
+              </div>
+              <p class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">
+                <?php echo $borrowed_today; ?>
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Currently borrowed
+              </p>
+            </div>
+            <div
+              class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border-l-4 border-green-400
+         transition duration-200 hover:bg-green-50 dark:hover:bg-gray-700 hover:shadow-md hover:-translate-y-1"
+>
+              <div class="flex justify-between items-start">
+                <p class="text-gray-500 dark:text-gray-400">Days Visited</p>
+               <span class="material-symbols-outlined text-green-500"
+                    >groups</span
+                  >
+              </div>
+              <p class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">
+                <?php echo $days_visited; ?>
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">This month</p>
+            </div>
+            <div
+              class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border-l-4 border-red-400
+              transition duration-200 hover:bg-red-50 dark:hover:bg-gray-700 hover:shadow-md hover:-translate-y-1">
+              <div class="flex justify-between items-start">
+                <p class="text-gray-500 dark:text-gray-400">Overdue Books</p>
+                <span class="material-icons text-red-400">warning</span>
+              </div>
+              <p class="text-4xl font-bold mt-2 text-gray-800 dark:text-white">
+                <?php echo $overdue_count; ?>
+              </p>
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Need attention
+              </p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div
+              class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border-t-4 border-orange-400"
+            >
+              <h3
+                class="text-xl font-semibold mb-1 text-gray-800 dark:text-white"
+              >
+                Currently Borrowed Books
+              </h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                Books that need to be returned
+              </p>
+              <div class="space-y-4">
+                <?php if (empty($current_borrowings)): ?>
+                  <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                    <p class="text-sm text-gray-500 dark:text-gray-400">No currently borrowed books.</p>
+                  </div>
+                <?php else: ?>
+                  <?php foreach ($current_borrowings as $book): ?>
+                  <div
+                    class="flex justify-between items-center <?php echo $book['status'] === 'overdue' ? 'bg-red-50 dark:bg-gray-700/50' : 'bg-orange-50 dark:bg-gray-700/50'; ?> p-4 rounded-lg"
+                  >
+                    <div>
+                      <p class="font-semibold text-gray-800 dark:text-gray-200">
+                        <?php echo htmlspecialchars($book['title']); ?>
+                      </p>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">
+                        by <?php echo htmlspecialchars($book['author']); ?>
+                      </p>
+                      <p class="text-sm text-gray-500 dark:text-gray-400">
+                        Due: <?php echo htmlspecialchars($book['due_date']); ?>
+                      </p>
+                    </div>
+                    <span
+                      class="text-xs font-semibold px-3 py-1 <?php echo $book['status'] === 'overdue' ? 'bg-red-600' : 'bg-orange-500'; ?> text-white rounded-full"
+                      ><?php echo ucfirst($book['status']); ?></span
+                    >
+                  </div>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+              </div>
+            </div>
+            <div
+              class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border-t-4 border-teal-400"
+            >
+              <h3
+                class="text-xl font-semibold mb-1 text-gray-800 dark:text-white"
+              >
+                Quick Actions
+              </h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                Common tasks
+              </p>
+              <div class="space-y-4">
+                <a
+                  class="flex items-center gap-4 p-4 rounded-lg bg-orange-50 hover:bg-orange-100 dark:bg-gray-700/50 dark:hover:bg-gray-700"
+                  href="Book_Management.php"
+                >
+                  <div
+                    class="p-2 bg-orange-100 dark:bg-orange-900/50 rounded-full"
+                  >
+                    <span class="material-icons text-orange-500">book</span>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-gray-800 dark:text-gray-200">
+                      Add New Book
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      For adding a new books
+                    </p>
+                  </div>
+                </a>
+                <a
+                  class="flex items-center gap-4 p-4 rounded-lg bg-green-50 hover:bg-green-100 dark:bg-gray-700/50 dark:hover:bg-gray-700"
+                  href="user-management.php"
+                >
+                  <div
+                    class="p-2 bg-green-100 dark:bg-green-900/50 rounded-full"
+                  >
+                    <span class="material-icons text-green-500">auto_stories</span>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-gray-800 dark:text-gray-200">
+                      User Management
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      For managing users
+                    </p>
+                  </div>
+                </a>
+                  <a
+                  class="flex items-center gap-4 p-4 rounded-lg bg-yellow-50 hover:bg-yellow-100 dark:bg-gray-700/50 dark:hover:bg-gray-700"
+                  href="borrow.php"
+                >
+                  <div
+                    class="p-2 bg-yellow-100 dark:bg-yellow-900/50 rounded-full"
+                  >
+                    <span class="material-icons text-yellow-500">history</span>
+                  </div>
+                  <div>
+                    <p class="font-semibold text-gray-800 dark:text-gray-200">
+                      View History
+                    </p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      Check borrowing history
+                    </p>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+        </main>
+      <footer class="h-14 flex items-center justify-between px-8 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700">
+          <div class="text-sm">© 2025 OMSC Library</div>
+          <div class="text-sm text-slate-500 space-x-4">
+            <a href="/privacy.html" class="hover:text-primary">Privacy</a>
+            <a href="/terms.html" class="hover:text-primary">Terms</a>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>
+<?php
+$conn->close();
+?>

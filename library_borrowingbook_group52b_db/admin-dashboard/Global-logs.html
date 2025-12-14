@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Global Logs</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#31694E",
+              "background-light": "#f8fafc",
+              "background-dark": "#1e293b",
+            },
+            fontFamily: {
+              display: ["Poppins", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-background-light dark:bg-background-dark font-display">
+    <div class="flex h-screen">
+      <div id="backdrop" class="fixed inset-0 bg-black/40 z-40 hidden md:hidden"></div>
+      <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 transform -translate-x-full md:translate-x-0 md:static md:flex bg-slate-50 dark:bg-slate-800 flex flex-col border-r border-slate-200 dark:border-slate-700 transition-transform duration-200">
+        <div class="h-16 flex items-center px-6 border-b border-slate-200 dark:border-slate-700">
+          <span class="material-icons text-primary mr-2">school</span>
+          <span class="font-bold text-lg text-slate-800 dark:text-slate-100">Library System</span>
+          <button id="menu-close" class="md:hidden p-2 text-slate-500 dark:text-slate-300 hover:text-slate-700 dark:hover:text-slate-200 ml-auto">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+          <a class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md" href="admin.html">
+            <span class="material-icons mr-3">dashboard</span>
+            Dashboard
+          </a>
+          <a class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md" href="book-management.html">
+            <span class="material-icons mr-3">menu_book</span>
+            Book Management
+          </a>
+          <a
+            class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md"
+            href="user-management.html"
+          >
+            <span class="material-icons mr-3">group</span>
+            User Management
+          </a>
+          <a class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md" href="borrow.html">
+            <span class="material-icons mr-3">history</span>
+            Borrowing History
+          </a>
+          <a class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md" href="Overdue-alerts.html">
+              <span class="material-icons mr-3">warning</span>
+              Overdue Alerts
+            </a>
+           <a class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md" href="Global-logs.html">
+            <span class="material-icons mr-3">analytics</span>
+            Global Logs
+          </a>
+          <a class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md" href="backup-restore.html">
+            <span class="material-icons mr-3">backup</span>
+            Backup & Restore
+          </a>
+          <a class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md"
+                    href="Attendance-logs.html">
+                    <span class="material-icons mr-3">event_available</span>
+                    Attendance Logs
+                </a>
+          <a class="flex items-center px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white rounded-md transform transition-all duration-150 hover:translate-x-1 hover:shadow-md" href="change-password.html">
+            <span class="material-icons mr-3">lock</span>
+            Change Password
+          </a>
+        </nav>
+        <div class="p-4 flex items-center text-sm text-zinc-500 dark:text-zinc-400">
+          <span class="material-icons text-orange-500 mr-2"></span>
+          <span class="font-medium text-slate-800 dark:text-slate-100"></span>
+        </div>
+      </aside>
+      <main class="flex-1 flex flex-col">
+        <header class="h-16 flex items-center justify-between px-8 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+          <div class="flex items-center md:hidden mr-4">
+            <button id="menu-btn" aria-expanded="false" class="p-2 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100" aria-label="Open sidebar">
+              <span class="material-icons">menu</span>
+            </button>
+          </div>
+          <h1 class="text-xl font-semibold text-slate-800 dark:text-slate-100">Admin Dashboard</h1>
+          <div class="flex items-center gap-4">
+            <div class="text-right">
+              <p class="font-medium text-sm text-slate-800 dark:text-slate-100">Alex Johnson</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">alex.johnson@student.university.edu</p>
+            </div>
+            <button onclick="window.location.href='../login/login.html'" class="ml-4 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"><span class="material-icons">logout</span></button>
+          </div>
+        </header>
+        <div class="flex-1 p-8 overflow-y-auto">
+          <div class="max-w-7xl mx-auto space-y-8">
+            <div class="mb-6">
+              <h2
+                class="text-2xl font-bold text-zinc-800 dark:text-zinc-100 flex items-center gap-3"
+              >
+                
+                Global Activity Logs
+              </h2>
+              <p class="text-zinc-500 dark:text-zinc-400 mt-1">
+                Comprehensive monitoring of all system activities and user actions across the platform.
+              </p>
+            </div>
+            <div
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
+          >
+            <div
+              class="bg-orange-50 dark:bg-gray-700 p-4 rounded-lg flex items-center justify-between border-l-4 border-orange-400
+         transition duration-200 hover:bg-orange-100 dark:hover:bg-gray-600 hover:shadow-md hover:-translate-y-1"
+            >
+              <div>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">
+                  Total Logs
+                </p>
+                <p class="text-2xl font-bold text-gray-800 dark:text-white">
+                  4
+                
+              </div>
+              <span
+                class="material-icons-outlined text-orange-400 bg-orange-100 dark:bg-gray-600 p-2 rounded-full"
+                >collections_bookmark</span
+              >
+            </div>
+            <div
+              class="bg-blue-50 dark:bg-gray-700 p-4 rounded-lg flex items-center justify-between border-l-4 border-blue-400
+         transition duration-200 hover:bg-blue-100 dark:hover:bg-gray-600 hover:shadow-md hover:-translate-y-1"
+>
+              <div>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">
+                  Authentication
+                </p>
+                <p class="text-2xl font-bold text-gray-800 dark:text-white">
+                  2
+                </p>
+                
+              </div>
+              <span
+                class="material-icons-outlined text-green-400 bg-green-100 dark:bg-gray-600 p-2 rounded-full"
+                >shield</span
+              >
+            </div>
+            <div
+              class="bg-green-50 dark:bg-gray-700 p-4 rounded-lg flex items-center justify-between border-l-4 border-green-400
+         transition duration-200 hover:bg-green-100 dark:hover:bg-gray-600 hover:shadow-md hover:-translate-y-1"
+>
+              <div>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">Books</p>
+                <p class="text-2xl font-bold text-gray-800 dark:text-white">
+                  1
+                </p>
+              </div>
+              <span
+                class="material-icons-outlined text-red-400 bg-red-100 dark:bg-gray-600 p-2 rounded-full"
+                >book</span
+              >
+            </div>
+            <div
+              class="bg-blue-50 dark:bg-gray-700 p-4 rounded-lg flex items-center justify-between border-l-4 border-blue-400
+         transition duration-200 hover:bg-blue-100 dark:hover:bg-gray-600 hover:shadow-md hover:-translate-y-1"
+>
+              <div>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">Users</p>
+                <p class="text-2xl font-bold text-gray-800 dark:text-white">
+                  3
+                </p>
+              </div>
+              <span
+                class="material-icons-outlined text-blue-400 bg-blue-100 dark:bg-gray-600 p-2 rounded-full"
+                >group</span
+              >
+              
+            </div>            
+            </div>
+            <div
+            class="bg-white dark:bg-gray-800 p-6 rounded-lg border border-slate-200 dark:border-slate-700 mb-8"
+          >
+            <div class="flex items-center gap-2 mb-4">
+              <span class="material-icons text-slate-500 dark:text-slate-400"
+                >filter_alt</span
+              >
+              <h3
+                class="text-lg font-semibold text-slate-800 dark:text-slate-200"
+              >
+                Search &amp; Filter
+              </h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 ">
+              <div class="relative col-span-1 md:col-span-2 ">
+                <span
+                  class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                  >search</span
+                >
+                <input
+                  id="search-input"
+                  class="w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-600 rounded bg-background-light dark:bg-gray-700 text-slate-800 dark:text-slate-200 focus:ring-primary focus:border-primary"
+                  placeholder="Search logs..."
+                  type="text"
+                />
+              </div>
+              <div class="col-span-1">
+                <select
+                  id="category-filter"
+                  class="w-full py-2 px-4 border border-slate-300 dark:border-slate-600 rounded bg-background-light dark:bg-gray-700 text-slate-800 dark:text-slate-200 focus:ring-primary focus:border-primary"
+                >
+                  <option>All Categories</option>
+                  <option>Authentication</option>
+                  <option>Book Management</option>
+                  <option>User Management</option>
+                </select>
+                </div>
+            </div>
+            </div>
+            <div>
+            <h4
+              class="text-xl font-semibold mb-4 text-gray-900 dark:text-white"
+            >
+            Activity Logs
+            </h4>
+            <div class="space-y-4">
+              <div
+                class="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg p-4
+         transition duration-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:shadow-md hover:-translate-y-1"
+>
+                <div class="flex justify-between items-start mb-3">
+                  <div>
+                    <h5
+                      class="font-semibold text-gray-900 dark:text-white flex items-center"
+                    >
+                      <span
+                        class="material-icons-outlined text-lg mr-2 text-orange-500"
+                        >book</span
+                      >Book Borrowed
+                    </h5>
+                    <p
+                      class="text-xs text-muted-light dark:text-muted-dark mt-1"
+                    >
+                     Student Alex Johnson borrowed "Introduction to Computer Science"
+                    </p>
+                  </div>
+                  <span
+                      class="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold "
+                      >Book Management</span
+                    >
+                </div>
+                <div class="gap-4">
+                    
+                  <div class="bg-purple-50 dark:bg-purple-900/20 p-3 rounded">
+                    <p
+                      class="text-xs text-purple-600 dark:text-purple-400 font-medium"
+                    >
+                      User
+                    </p>
+                    <p
+                      class="font-medium text-gray-800 dark:text-gray-200 mt-1"
+                    >
+                      Sarah Chen (Librarian)
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg p-4
+         transition duration-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:shadow-md hover:-translate-y-1"
+>
+                <div class="flex justify-between items-start mb-3">
+                  <div>
+                    <h5
+                      class="font-semibold text-gray-900 dark:text-white flex items-center"
+                    >
+                      <span
+                        class="material-icons-outlined text-lg mr-2 text-orange-500"
+                        >group</span
+                      >User Created
+                    </h5>
+                    <p
+                      class="text-xs text-muted-light dark:text-muted-dark mt-1"
+                    >
+                      Created new student account for Emma Wilson
+                    </p>
+                  </div>
+                  <span
+                      class="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold "
+                      >User Management</span
+                    >
+                </div>
+                <div class="gap-4">
+                  
+                  <div class="bg-purple-50 dark:bg-purple-900/20 p-3 rounded">
+                    <p
+                      class="text-xs text-purple-600 dark:text-purple-400 font-medium"
+                    >
+                      User
+                    </p>
+                    <p
+                      class="font-medium text-gray-800 dark:text-gray-200 mt-1"
+                    >
+                     John Anderson (Admin)
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div
+                class="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-lg p-4
+         transition duration-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 hover:shadow-md hover:-translate-y-1"
+>
+                <div class="flex justify-between items-start mb-3">
+                  <div>
+                    <h5
+                      class="font-semibold text-gray-900 dark:text-white flex items-center"
+                    >
+                      <span
+                        class="material-icons-outlined text-lg mr-2 text-orange-500"
+                        >shield</span
+                      >Login
+                    </h5>
+                    <p
+                      class="text-xs text-muted-light dark:text-muted-dark mt-1"
+                    >
+                      Successful login to student dashboard
+
+
+                    </p>
+                  </div>
+                  <span
+                      class="bg-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold "
+                      >Authentication</span
+                    >
+                </div>
+                <div class="gap-4">
+                  
+                  <div class="bg-purple-50 dark:bg-purple-900/20 p-3 rounded">
+                    <p
+                      class="text-xs text-purple-600 dark:text-purple-400 font-medium"
+                    >
+                      User
+                    </p>
+                    <p
+                      class="font-medium text-gray-800 dark:text-gray-200 mt-1"
+                    >
+                      Alex Johnson (Student)
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>
+        <footer
+          class="h-14 flex items-center justify-between px-8 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700"
+        >
+          <div class="flex items-center text-sm">
+            <span class="material-icons text-orange-500 mr-2"></span>
+            <span class="font-medium text-slate-800 dark:text-slate-100">OMSC Library</span>
+          </div>
+          <div class="text-sm text-slate-500 dark:text-slate-400 space-x-4">
+            <span>© 2025 OMSC Library</span>
+            <a class="hover:text-primary" href="privacy.html">Privacy</a>
+            <a class="hover:text-primary" href="terms.html">Terms</a>
+          </div>
+        </footer>
+      </main>
+    </div>
+    <script>
+      // Sidebar toggle + auto highlight for borrowing page
+      (function () {
+        var btn = document.getElementById('menu-btn');
+        var closeBtn = document.getElementById('menu-close');
+        var sidebar = document.getElementById('sidebar');
+        var backdrop = document.getElementById('backdrop');
+        var navLinks = document.querySelectorAll('#sidebar nav a');
+
+        function showSidebar() {
+          sidebar.classList.remove('-translate-x-full');
+          sidebar.classList.add('translate-x-0');
+          backdrop.classList.remove('hidden');
+          document.body.style.overflow = 'hidden';
+          if (btn) btn.setAttribute('aria-expanded', 'true');
+        }
+
+        function hideSidebar() {
+          sidebar.classList.add('-translate-x-full');
+          sidebar.classList.remove('translate-x-0');
+          backdrop.classList.add('hidden');
+          document.body.style.overflow = '';
+          if (btn) btn.setAttribute('aria-expanded', 'false');
+        }
+
+        document.addEventListener('keydown', function (ev) {
+          if (ev.key === 'Escape' && window.innerWidth < 768) {
+            hideSidebar();
+          }
+        });
+
+        if (btn && sidebar && backdrop) {
+          btn.addEventListener('click', function () {
+            showSidebar();
+          });
+        }
+
+        if (closeBtn && sidebar && backdrop) {
+          closeBtn.addEventListener('click', function () {
+            hideSidebar();
+          });
+        }
+
+        if (backdrop) {
+          backdrop.addEventListener('click', function () {
+            hideSidebar();
+          });
+        }
+
+        if (navLinks && navLinks.length) {
+          navLinks.forEach(function (a) {
+            a.addEventListener('click', function () {
+              if (window.innerWidth < 768) hideSidebar();
+            });
+          });
+        }
+
+        // Auto highlight active sidebar link
+        var current = location.pathname.split('/').pop() || 'borrowing.html';
+        navLinks.forEach(function (a) {
+          var href = a.getAttribute('href');
+          if (!href) return;
+          var name = href.split('/').pop();
+          if (name === current) {
+            a.classList.add('bg-primary', 'text-white');
+            a.setAttribute('aria-current', 'page');
+          } else {
+            a.classList.remove('bg-primary', 'text-white');
+            a.removeAttribute('aria-current');
+          }
+        });
+      })();
+
+      // Search and filter functionality
+      (function () {
+        var searchInput = document.getElementById('search-input');
+        var filterSelect = document.getElementById('category-filter');
+        var logItems = document.querySelectorAll('.space-y-4 > div');
+
+        function filterLogs() {
+          var searchTerm = searchInput.value.toLowerCase();
+          var selectedCategory = filterSelect.value;
+
+          logItems.forEach(function (item) {
+            var title = item.querySelector('h5').textContent.toLowerCase();
+            var categorySpan = item.querySelector('span.bg-green-600');
+            if (!categorySpan) return;
+            var category = categorySpan.textContent.trim();
+
+            var matchesSearch = title.includes(searchTerm);
+            var matchesCategory = selectedCategory === 'All Categories' || category === selectedCategory;
+
+            if (matchesSearch && matchesCategory) {
+              item.style.display = 'block';
+            } else {
+              item.style.display = 'none';
+            }
+          });
+        }
+
+        if (searchInput) {
+          searchInput.addEventListener('input', filterLogs);
+        }
+        if (filterSelect) {
+          filterSelect.addEventListener('change', filterLogs);
+          // Initial filter on page load
+          filterLogs();
+        }
+      })();
+    </script>
+  </body>
+</html>
