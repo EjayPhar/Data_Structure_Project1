@@ -362,7 +362,7 @@ while ($row = $category_result->fetch_assoc()) {
                   Book Management
                 </h3>
                 <p class="text-gray-500 dark:text-gray-400 mt-1">
-                  Manage students, librarians, and system access.
+                  Manage library books, availability, and inventory.
                 </p>
               </div>
               <div class="flex items-center gap-4">
